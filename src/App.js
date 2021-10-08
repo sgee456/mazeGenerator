@@ -1,15 +1,16 @@
+import { callExpression } from '@babel/types';
 import './App.css';
 
 import Maze from './Maze.js';
 
 function App() {
-  const mazeArray = [
-    [0, 0, 0, 0, 0],
-    [1, 0, 1, 0, 0],
-    [0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 1]
-  ];
+  // const mazeArray = [
+  //   [0, 0, 0, 0, 0],
+  //   [1, 0, 1, 0, 0],
+  //   [0, 0, 0, 1, 0],
+  //   [0, 0, 0, 0, 0],
+  //   [0, 1, 0, 0, 1]
+  // ];
 
   function createMazeWallArray(width, height) {
     let mazeWallArray = [];
@@ -74,17 +75,34 @@ function App() {
         onTopRow || 
         onRightColumn || 
         newPathArray[y - 1][x + 1] === 1;
+
+      // console.log(leftValue , topValue ,bottomValue, rightValue ,topRightValue, bottomRightValue ,topLeftValue ,bottomLeftValue);
+      //if all surrounding squares are walls/out of the maze, return true
+      return (leftValue && topValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
     }
+
+    //checkPathAround seems to work
+    console.log(
+      checkPathAround([0,0]),
+      checkPathAround([1,0]),
+      "further up checking[0,1]", checkPathAround([0,1]),
+      checkPathAround([1,1])
+
+    );
     
     function changeWall(position) {
       const x = position[0];
       const y = position[1];
-      newPathArray[y][x] = 0;
+      //this breaks my checkPathAround but I don't know why
+      // newPathArray[y][x] = 0;
     }
+
+    
     //start at a wall block, and turn it to path block- push location onto stack
     changeWall(startPosition);
+    console.log('checking checkPathAround just after changeWall()', checkPathAround([0,1]));
     pathStack.push(startPosition);
-    while (false && pathStack.length !== 0) {
+    while (pathStack.length !== 0) {
       //look at all surrounding blocks for blocks that don't touch another path block
       const currentPosition = pathStack[pathStack.length -1];
       const x = currentPosition[0];
@@ -95,24 +113,31 @@ function App() {
       const possibleLeftPosition = [x - 1, y];
       const possibleRightPosition = [x + 1, y];
 
-      const possibleChoices = [];
+      console.log("bottom", (possibleBottomPosition))
+      console.log("bottom result", checkPathAround(possibleBottomPosition))
 
-      if (possibleTopPosition) {
+      console.log("manually entering array", checkPathAround([0, 1]))
+
+      const possibleChoices = [];
+      //prevent from pushing to possible answers if current position on top row
+      if (y !== 0 && checkPathAround(possibleTopPosition)) {
         possibleChoices.push(possibleTopPosition);
       }
-      if (possibleBottomPosition) {
+      if (y !== newPathArray.length - 1 && checkPathAround(possibleBottomPosition)) {
         possibleChoices.push(possibleBottomPosition);
       }
-      if (possibleLeftPosition) {
+      if (x !== 0 && checkPathAround(possibleLeftPosition)) {
         possibleChoices.push(possibleLeftPosition);
       }
-      if (possibleRightPosition) {
+      if (x !== newPathArray[0].length - 1 && checkPathAround(possibleRightPosition)) {
         possibleChoices.push(possibleRightPosition);
       }
+
       //randomly choose one to turn into a path block- push location onto stack
       if (possibleChoices.length !== 0) {
         const randomIndex = Math.floor(Math.random() * possibleChoices.length);
         const newPathBlock = possibleChoices[randomIndex];
+        console.log(newPathBlock);
         changeWall(newPathBlock);
         pathStack.push(newPathBlock);
       } else {
@@ -124,8 +149,12 @@ function App() {
 
     }
 
+    //when done return new array
+    return newPathArray;
   }
 
+
+  const mazeArray = createPath();
 
 
   //remove these after testing?
