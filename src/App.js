@@ -76,8 +76,9 @@ function App() {
         onRightColumn || 
         newPathArray[y - 1][x + 1] === 1;
 
-      // console.log(leftValue , topValue ,bottomValue, rightValue ,topRightValue, bottomRightValue ,topLeftValue ,bottomLeftValue);
       //if all surrounding squares are walls/out of the maze, return true
+      //need to exclude certain squares on what is passed into the function eg. possibleTopPosition has to exclude the bottomValue b/ our last path square is guaranteed to be there
+
       return (leftValue && topValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
     }
 
@@ -93,8 +94,8 @@ function App() {
     function changeWall(position) {
       const x = position[0];
       const y = position[1];
-      //this breaks my checkPathAround but I don't know why
-      // newPathArray[y][x] = 0;
+      //this breaks my checkPathAround but I don't know why- I think its how my checkPathAround function is acting
+      newPathArray[y][x] = 0;
     }
 
     
