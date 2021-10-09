@@ -32,7 +32,7 @@ function App() {
   const createPath = function() {
     const pathStack = [];
     const startPosition = [0, 0];
-    const newPathArray = createMazeWallArray(20 , 20);
+    const newPathArray = createMazeWallArray(40 , 20);
     //allows us to mark when the first dead end occurs
     let endOfFirstPath = true;
 
@@ -188,7 +188,7 @@ function App() {
 
 
   //remove these after testing?
-  //This doesn't work because arrays inside need to be destructured too
+  //This doesn't work because arrays inside need to be destructured too or they are passed by reference
   // const mazeArray = createMazeWallArray(4,4);
   // const copy = [...mazeArray];
   // copy[0][0] = "hello";
