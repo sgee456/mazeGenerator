@@ -32,7 +32,7 @@ function App() {
   const createPath = function() {
     const pathStack = [];
     const startPosition = [0, 0];
-    const newPathArray = createMazeWallArray(5 , 5);
+    const newPathArray = createMazeWallArray(10 , 10);
 
     //checks if a square is beside a path, also where it is checking from
     function checkPathAround(position, checkingFrom = "all" ) {
@@ -82,17 +82,17 @@ function App() {
       }
 
       if (checkingFrom === "top") {
-        return (leftValue && topValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+        return (leftValue && topValue && rightValue && topRightValue && topLeftValue);
       }
       
       if (checkingFrom === "bottom") {
-        return (leftValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+        return (leftValue && bottomValue && rightValue && bottomRightValue && bottomLeftValue);
       }
       if (checkingFrom === "left") {
-        return (leftValue && topValue && bottomValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+        return (leftValue && topValue && bottomValue && topLeftValue && bottomLeftValue);
       }
       if (checkingFrom === "right") {
-        return (topValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+        return (topValue && bottomValue && rightValue && topRightValue && bottomRightValue);
       }
 
     }
@@ -111,7 +111,7 @@ function App() {
 
 
     // while (pathStack.length !== 0)
-    for (let i = 0; i < 3; i++) 
+    for (let i = 0; i < 70; i++) 
     {
       //look at all surrounding blocks for blocks that don't touch another path block
       const currentPosition = pathStack[pathStack.length -1];
@@ -162,7 +162,8 @@ function App() {
       //then pop a block off the stack and try this again
       //when the stack is gone, the path is complete
     }
-
+    
+    console.log('all done!')
     //when done return new array
     return newPathArray;
   }
