@@ -1,4 +1,3 @@
-import { callExpression } from '@babel/types';
 import './App.css';
 
 import Maze from './Maze.js';
@@ -35,8 +34,8 @@ function App() {
     const startPosition = [0, 0];
     const newPathArray = createMazeWallArray(5 , 5);
 
-    //checks if a square is beside a path
-    function checkPathAround(position) {
+    //checks if a square is beside a path, also where it is checking from
+    function checkPathAround(position, checkingFrom = "all" ) {
       const x = position[0];
       const y = position[1];
       //check all eight blocks around possible path block for other path blocks/ outside of maze
@@ -78,18 +77,25 @@ function App() {
 
       //if all surrounding squares are walls/out of the maze, return true
       //need to exclude certain squares on what is passed into the function eg. possibleTopPosition has to exclude the bottomValue b/ our last path square is guaranteed to be there
+      if (checkingFrom === "all") {
+        return (leftValue && topValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+      }
 
-      return (leftValue && topValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+      if (checkingFrom === "top") {
+        return (leftValue && topValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+      }
+      
+      if (checkingFrom === "bottom") {
+        return (leftValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+      }
+      if (checkingFrom === "left") {
+        return (leftValue && topValue && bottomValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+      }
+      if (checkingFrom === "right") {
+        return (topValue && bottomValue && rightValue && topRightValue && bottomRightValue && topLeftValue && bottomLeftValue);
+      }
+
     }
-
-    //checkPathAround seems to work
-    console.log(
-      checkPathAround([0,0]),
-      checkPathAround([1,0]),
-      "further up checking[0,1]", checkPathAround([0,1]),
-      checkPathAround([1,1])
-
-    );
     
     function changeWall(position) {
       const x = position[0];
@@ -101,9 +107,12 @@ function App() {
     
     //start at a wall block, and turn it to path block- push location onto stack
     changeWall(startPosition);
-    console.log('checking checkPathAround just after changeWall()', checkPathAround([0,1]));
     pathStack.push(startPosition);
-    while (pathStack.length !== 0) {
+
+
+    // while (pathStack.length !== 0)
+    for (let i = 0; i < 3; i++) 
+    {
       //look at all surrounding blocks for blocks that don't touch another path block
       const currentPosition = pathStack[pathStack.length -1];
       const x = currentPosition[0];
@@ -114,31 +123,36 @@ function App() {
       const possibleLeftPosition = [x - 1, y];
       const possibleRightPosition = [x + 1, y];
 
-      console.log("bottom", (possibleBottomPosition))
-      console.log("bottom result", checkPathAround(possibleBottomPosition))
-
-      console.log("manually entering array", checkPathAround([0, 1]))
-
       const possibleChoices = [];
       //prevent from pushing to possible answers if current position on top row
-      if (y !== 0 && checkPathAround(possibleTopPosition)) {
+      // console.log(
+      //   "checking top:", checkPathAround(possibleTopPosition, "top"),
+      //   "checking bottom:", checkPathAround(possibleBottomPosition),
+      // );
+
+
+      //each of these conditions checks that the possible position is not a path, that it is not outside of the maze, and that no other squares around it are paths
+      if (y !== 0 && newPathArray[y - 1][x] === 1 && checkPathAround(possibleTopPosition, "top")) {
         possibleChoices.push(possibleTopPosition);
       }
-      if (y !== newPathArray.length - 1 && checkPathAround(possibleBottomPosition)) {
+      if (y !== newPathArray.length - 1 && newPathArray[y + 1][x] === 1 && checkPathAround(possibleBottomPosition, "bottom")) {
         possibleChoices.push(possibleBottomPosition);
       }
-      if (x !== 0 && checkPathAround(possibleLeftPosition)) {
+      if (x !== 0 && newPathArray[y][x - 1] === 1 && checkPathAround(possibleLeftPosition, "left")) {
         possibleChoices.push(possibleLeftPosition);
       }
-      if (x !== newPathArray[0].length - 1 && checkPathAround(possibleRightPosition)) {
+      if (x !== newPathArray[0].length - 1 && newPathArray[y][x + 1] === 1 && checkPathAround(possibleRightPosition, "right")) {
         possibleChoices.push(possibleRightPosition);
       }
+
+      console.log(`possible choices ${i}`, possibleChoices)
 
       //randomly choose one to turn into a path block- push location onto stack
       if (possibleChoices.length !== 0) {
         const randomIndex = Math.floor(Math.random() * possibleChoices.length);
         const newPathBlock = possibleChoices[randomIndex];
-        console.log(newPathBlock);
+        console.log(`random index ${i}`, randomIndex)
+        console.log(`newPathBlock ${i}`, newPathBlock);
         changeWall(newPathBlock);
         pathStack.push(newPathBlock);
       } else {
@@ -147,7 +161,6 @@ function App() {
       //repeat this until no surrounding blocks can be made into path
       //then pop a block off the stack and try this again
       //when the stack is gone, the path is complete
-
     }
 
     //when done return new array
