@@ -32,7 +32,9 @@ function App() {
   const createPath = function() {
     const pathStack = [];
     const startPosition = [0, 0];
-    const newPathArray = createMazeWallArray(10 , 10);
+    const newPathArray = createMazeWallArray(20 , 20);
+    //allows us to mark when the first dead end occurs
+    let endOfFirstPath = true;
 
     //checks if a square is beside a path, also where it is checking from
     function checkPathAround(position, checkingFrom = "all" ) {
@@ -44,7 +46,7 @@ function App() {
       const onLeftColumn = x === 0;
       const onRightColumn = x === newPathArray[0].length - 1;
 
-      //each of these values checks if a square around possible path block is a wall or outside of the maze and has a value of true if there's a wall
+      //each of these values checks if a square around possible path block is a wall or outside of the maze and will have a value of true if there's a wall
 
       const leftValue = onLeftColumn || newPathArray[y][x - 1] === 1;
 
@@ -97,21 +99,30 @@ function App() {
 
     }
     
-    function changeWall(position) {
+    function changeWall(position, type = "wall") {
       const x = position[0];
       const y = position[1];
       //this breaks my checkPathAround but I don't know why- I think its how my checkPathAround function is acting
-      newPathArray[y][x] = 0;
+
+      if (type === "wall") {
+        newPathArray[y][x] = 0;
+      }
+      if (type === "start") {
+        newPathArray[y][x] = 2;
+      }
+      if (type === "end") {
+        newPathArray[y][x] = 3;
+      }
     }
 
     
     //start at a wall block, and turn it to path block- push location onto stack
-    changeWall(startPosition);
+    changeWall(startPosition, "start");
     pathStack.push(startPosition);
 
 
-    // while (pathStack.length !== 0)
-    for (let i = 0; i < 70; i++) 
+    while (pathStack.length !== 0)
+    // for (let i = 0; i < 70; i++) 
     {
       //look at all surrounding blocks for blocks that don't touch another path block
       const currentPosition = pathStack[pathStack.length -1];
@@ -145,16 +156,20 @@ function App() {
         possibleChoices.push(possibleRightPosition);
       }
 
-      console.log(`possible choices ${i}`, possibleChoices)
+      // console.log(`possible choices ${i}`, possibleChoices)
 
       //randomly choose one to turn into a path block- push location onto stack
       if (possibleChoices.length !== 0) {
         const randomIndex = Math.floor(Math.random() * possibleChoices.length);
         const newPathBlock = possibleChoices[randomIndex];
-        console.log(`random index ${i}`, randomIndex)
-        console.log(`newPathBlock ${i}`, newPathBlock);
+        // console.log(`random index ${i}`, randomIndex)
+        // console.log(`newPathBlock ${i}`, newPathBlock);
         changeWall(newPathBlock);
         pathStack.push(newPathBlock);
+      } else if (endOfFirstPath === true) {
+        changeWall(currentPosition, "end");
+        pathStack.pop();
+        endOfFirstPath = false;
       } else {
         pathStack.pop();
       }

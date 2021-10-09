@@ -21,9 +21,17 @@ html { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: 
 }
 
 .Block0 {
-  background-color: peachpuff;
+  background-color: lightgrey;
 }
 
 .Block1 {
-  background-color: black;
+  background-color: darkslategrey;
+}
+
+.Block2 {
+  background-color: greenyellow;
+}
+
+.Block3 {
+  background-color: hotpink;
 }
